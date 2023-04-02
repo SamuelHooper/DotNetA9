@@ -82,20 +82,26 @@
 
         public string SearchAllMedia(string searchString)
         {
-            string output = SearchMedia(Movies, searchString);
-            output += SearchMedia(Shows, searchString);
-            output += SearchMedia(Videos, searchString);
+            string output = "";
+            int count = 0;
 
-            if (!output.Any())
-            {
-                return $"\nNo results found for \"{searchString}\"";
-            }
-            return output;
+            var movieResult = SearchMedia(Movies, searchString);
+            output += movieResult.Item1;
+            count += movieResult.Item2;
+            var showResult = SearchMedia(Shows, searchString);
+            output += showResult.Item1;
+            count += showResult.Item2;
+            var videoResult = SearchMedia(Videos, searchString);
+            output += videoResult.Item1;
+            count += videoResult.Item2;
+
+            return $"\n{count} results found for \"{searchString}\"\n{output}";
         }
 
-        private static string SearchMedia(List<Media> mediaList, string searchString)
+        private static Tuple<string, int> SearchMedia(List<Media> mediaList, string searchString)
         {
             string output = "";
+            int count = 0;
             var result = mediaList.Where(m => m.Title.Contains(searchString, StringComparison.CurrentCultureIgnoreCase));
             if (result.Any())
             {
@@ -103,9 +109,10 @@
                 foreach (var media in result)
                 {
                     output += $"\n\t{media.Title}";
+                    count++;
                 }
             }
-            return output;
+            return new Tuple<string, int>(output, count);
         }
     }
 }
